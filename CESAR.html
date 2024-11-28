@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cifra de César</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5dc; /* Cor puxada para bege */
+            color: #333;
+        }
+        textarea, input, select, button {
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .alphabet {
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+            font-family: monospace;
+            white-space: pre;
+        }
+        .transformation {
+            font-family: monospace;
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cifra de César</h1>
+        <form id="cifraForm">
+            <label for="texto">Texto:</label><br>
+            <textarea id="texto" placeholder="Digite o texto aqui..." required></textarea><br>
+
+            <label for="deslocamento">Deslocamento:</label><br>
+            <input type="number" id="deslocamento" value="3" required><br>
+
+            <label for="modo">Modo:</label><br>
+            <select id="modo">
+                <option value="codificar">Codificar</option>
+                <option value="decodificar">Decodificar</option>
+            </select><br><br>
+
+            <button type="button" onclick="processarTexto()">Processar</button>
+        </form>
+
+        <div class="result" id="resultado"></div>
+        <div class="alphabet" id="alfabeto"></div>
+        <div class="transformation" id="transformacao"></div>
+    </div>
+
+    <script>
+        function gerarAlfabeto(deslocamento, modo) {
+            const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            let deslocado = "";
+            if (modo === "decodificar") {
+                deslocamento = -deslocamento;
+            }
+
+            for (let i = 0; i < alfabeto.length; i++) {
+                deslocado += alfabeto[(i + deslocamento + 26) % 26];
+            }
+
+            // Formata com espaçamento entre as letras
+            const formatar = (str) => str.split("").join(" ");
+            return `${formatar(alfabeto)}\n${formatar(deslocado)}`;
+        }
+
+        function cifraCesar(texto, deslocamento, modo) {
+            if (modo === "decodificar") {
+                deslocamento = -deslocamento;
+            }
+
+            let resultado = "";
+            let transformacao = "";
+
+            for (let i = 0; i < texto.length; i++) {
+                const char = texto[i];
+                if (char.match(/[a-z]/i)) { // Verifica se é uma letra
+                    const base = char === char.toUpperCase() ? 65 : 97; // Base ASCII
+                    const novoChar = String.fromCharCode(
+                        ((char.charCodeAt(0) - base + deslocamento + 26) % 26) + base
+                    );
+                    resultado += novoChar;
+                    transformacao += `${char} → ${novoChar}\n`;
+                } else {
+                    resultado += char; // Mantém caracteres que não são letras
+                    transformacao += `${char} → ${char}\n`;
+                }
+            }
+            return { resultado, transformacao };
+        }
+
+        function processarTexto() {
+            const texto = document.getElementById("texto").value;
+            const deslocamento = parseInt(document.getElementById("deslocamento").value, 10);
+            const modo = document.getElementById("modo").value;
+
+            const { resultado, transformacao } = cifraCesar(texto, deslocamento, modo);
+            const alfabeto = gerarAlfabeto(deslocamento, modo);
+
+            document.getElementById("resultado").textContent = `Resultado: ${resultado}`;
+            document.getElementById("alfabeto").textContent = alfabeto;
+            document.getElementById("transformacao").textContent = `Transformações:\n${transformacao}`;
+        }
+    </script>
+</body>
+</html>
